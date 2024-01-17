@@ -54,5 +54,4 @@ public class HotelBookingBehavior {
         ValidatableResponse response = new Requests(token).deleteBooking(id);
         response.assertThat().statusCode(SC_CREATED);
     }
-
 }

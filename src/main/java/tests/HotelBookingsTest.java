@@ -31,10 +31,7 @@ public class HotelBookingsTest extends BaseTest {
     @Test
     void getBookingIdsTest() {
         CreateBookingRs addedBooking = createBooking();
-        List<BookingIds> bookings = bookingBehavior.getBookingIds();
-        List<Integer> ids = new ArrayList<>();
-        bookings.forEach(booking -> ids.add(booking.getBookingId()));
-        assertTrue(ids.contains(addedBooking.getBookingId()), "Added booking is in the list");
+        assertTrue(bookingBehavior.getBookingIds().stream().anyMatch(id -> id.getBookingId().equals(addedBooking.getBookingId())), "Added booking is in the list");
     }
 
     @Test
@@ -52,19 +49,21 @@ public class HotelBookingsTest extends BaseTest {
     @Test
     void deleteBookingTest() {
         CreateBookingRs addedBooking = createBooking();
-        List<BookingIds> bookings = bookingBehavior.getBookingIds();
-        List<Integer> ids = new ArrayList<>();
-        bookings.forEach(booking -> ids.add(booking.getBookingId()));
-        assertTrue(ids.contains(addedBooking.bookingId), "Added booking is in the filtered list");
-        bookingBehavior.deleteBooking(token, addedBooking.getBookingId());
-        bookings = bookingBehavior.getBookingIds();
-        ids.clear();
-        bookings.forEach(booking -> ids.add(booking.getBookingId()));
-        assertFalse(ids.contains(addedBooking.bookingId), "Added booking is deleted from the list");
+        assertTrue(getBookings().stream().anyMatch(id -> id.getBookingId().equals(addedBooking.getBookingId())), "Added booking is in the filtered list");
+        deleteBooking(addedBooking.getBookingId());
+        assertFalse(getBookings().stream().anyMatch(id -> id.getBookingId().equals(addedBooking.getBookingId())), "Added booking is in the filtered list");
     }
 
     public CreateBookingRs createBooking() {
         return bookingBehavior.createBooking(prepareBookingBody());
+    }
+
+    public void deleteBooking(Integer bookingId) {
+        bookingBehavior.deleteBooking(token, bookingId);
+    }
+
+    public List<BookingIds> getBookings() {
+        return bookingBehavior.getBookingIds();
     }
 
     public CreateBookingRs createCustomBooking(String firstName, String lastName, Integer totalPrice, Boolean depositPaid, String additionalNeeds) {
